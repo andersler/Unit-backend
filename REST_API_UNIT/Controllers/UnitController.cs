@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using REST_API_UNIT.Models;
 using REST_API_UNIT.Services;
+using REST_API_UNIT.Utils;
 using System;
 using static REST_API_UNIT.DTO.UnitDTO;
 
@@ -12,12 +13,12 @@ namespace REST_API_UNIT.Controllers
     public class UnitController : ControllerBase
     {
         private readonly IUnitService _unitService;
-        private readonly ILogger<UnitController> logger;
+        private readonly ILogger<UnitController> _logger;
 
         public UnitController(IUnitService unitService, ILogger<UnitController> logger)
         {
             _unitService = unitService;
-            this.logger = logger;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -25,25 +26,33 @@ namespace REST_API_UNIT.Controllers
         {
             try
             {
-                DTOUnitGetSingleResponse response = new();
-                var unit = new Unit
+                if (Utils.InputValidationUtils.IsValid(request.Name) && Utils.InputValidationUtils.IsValid(request.Type))
                 {
-                    Name = request.Name,
-                    IsActive = request.IsActive,
-                    Type = request.Type,
-                };
+                    DTOUnitGetSingleResponse response = new();
+                    var unit = new Unit
+                    {
+                        Name = request.Name,
+                        IsActive = request.IsActive,
+                        Type = request.Type,
+                    };
 
-                var res = await _unitService.AddUnitAsync(unit);
+                    var res = await _unitService.AddUnitAsync(unit);
 
-                response.unit = res;
-                response.Message = $"Successfully added unit: {res.Name}";
+                    response.unit = res;
+                    response.Message = $"Successfully added unit: {res.Name}";
 
-                logger.LogInformation("Adding unit {UnitId} at {Time}", res.Id, DateTime.Now);
-                return Ok(response);
+                    _logger.LogInformation("Adding unit {UnitId} at {Time}", res.Id, DateTime.Now);
+                    return Ok(response);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to add unit at {Time}", DateTime.Now);
+                    return BadRequest();
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex.Message);
                 var Message = "Internal server error.";
                 return StatusCode(StatusCodes.Status500InternalServerError, Message);
             }
@@ -84,7 +93,7 @@ namespace REST_API_UNIT.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex.Message);
                 response.Message = "Internal server error.";
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
@@ -97,20 +106,27 @@ namespace REST_API_UNIT.Controllers
             {
                 DTOUnitGetSingleResponse response = new();
 
-                var existingUnit = await _unitService.GetUnitByIdAsync(id);
+                var existingUnit = await _unitService.GetUnitByIdAsync(id) != null ? await _unitService.GetUnitByIdAsync(id): null;
                 if (existingUnit != null)
                 {
-                    existingUnit.Name = request.Name;
-                    existingUnit.IsActive = request.IsActive;
-                    existingUnit.Type = request.Type;
+                    if (InputValidationUtils.IsValid(request.Name) && InputValidationUtils.IsValid(request.Type))
+                    {
+                        existingUnit.Name = request.Name;
+                        existingUnit.IsActive = request.IsActive;
+                        existingUnit.Type = request.Type;
 
-                    var res = await _unitService.UpdateUnitAsync(id, existingUnit);
+                        var res = await _unitService.UpdateUnitAsync(id, existingUnit);
 
-                    response.Message = $"Successfully updated unit";
-                    response.unit = res;
+                        response.Message = $"Successfully updated unit";
+                        response.unit = res;
 
-                    logger.LogInformation("Updating unit {UnitId} at {Time}", id, DateTime.Now);
-                    return Ok(response);
+                        _logger.LogInformation("Updating unit {UnitId} at {Time}", id, DateTime.Now);
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        return BadRequest();
+                    }
                 }
                 else
                 {
@@ -119,7 +135,7 @@ namespace REST_API_UNIT.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error.");
             }
         }
@@ -136,7 +152,7 @@ namespace REST_API_UNIT.Controllers
                 var res = await _unitService.DeleteUnitAsync(id);
                 if (!res)
                 {
-                    logger.LogInformation("Deleting unit {UnitId} at {Time}", id, DateTime.Now);
+                    _logger.LogInformation("Deleting unit {UnitId} at {Time}", id, DateTime.Now);
                     return Ok(response);
                 }
                 else
@@ -146,7 +162,7 @@ namespace REST_API_UNIT.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error.");
             }
         }
