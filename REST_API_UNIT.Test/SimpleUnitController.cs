@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web.Http;
+﻿using System.Web.Http;
 using REST_API_UNIT.Models;
 
 namespace REST_API_UNIT.Test
 {
-    public class SimpleProductController : ApiController
+    public class SimpleUnitController : ApiController
     {
         private List<Unit> units = new List<Unit>();
 
-        public SimpleProductController() { }
+        public SimpleUnitController() { }
 
-        public SimpleProductController(List<Unit> units)
+        public SimpleUnitController(List<Unit> units)
         {
             this.units = units;
         }

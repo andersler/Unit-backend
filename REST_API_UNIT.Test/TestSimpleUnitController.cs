@@ -14,7 +14,7 @@ namespace REST_API_UNIT.Test
         public void GetAllUnits_ShouldReturnAllUnits()
         {
             var testUnits = GetTestUnits();
-            var controller = new SimpleProductController(testUnits);
+            var controller = new SimpleUnitController(testUnits);
 
             var result = controller.GetAllUnits() as List<Unit>;
             Assert.AreEqual(testUnits.Count, result.Count);
@@ -24,7 +24,7 @@ namespace REST_API_UNIT.Test
         public async Task GetAllUnitsAsync_ShouldReturnAllUnits()
         {
             var testUnits = GetTestUnits();
-            var controller = new SimpleProductController(testUnits);
+            var controller = new SimpleUnitController(testUnits);
 
             var result = await controller.GetAllUnitsAsync() as List<Unit>;
             Assert.AreEqual(testUnits.Count, result.Count);
@@ -34,7 +34,7 @@ namespace REST_API_UNIT.Test
         public void GetUnit_ShouldReturnCorrectUnit()
         {
             var testUnits = GetTestUnits();
-            var controller = new SimpleProductController(testUnits);
+            var controller = new SimpleUnitController(testUnits);
 
             var result = controller.GetUnit(testUnits[3].Id) as OkNegotiatedContentResult<Unit>;
             Assert.IsNotNull(result);
@@ -45,7 +45,7 @@ namespace REST_API_UNIT.Test
         public async Task GetUnitAsync_ShouldReturnCorrectUnit()
         {
             var testUnits = GetTestUnits();
-            var controller = new SimpleProductController(testUnits);
+            var controller = new SimpleUnitController(testUnits);
 
             var result = await controller.GetUnitAsync(testUnits[3].Id) as OkNegotiatedContentResult<Unit>;
             Assert.IsNotNull(result);
@@ -55,7 +55,7 @@ namespace REST_API_UNIT.Test
         [TestMethod]
         public void GetUnit_ShouldNotFindUnit()
         {
-            var controller = new SimpleProductController(GetTestUnits());
+            var controller = new SimpleUnitController(GetTestUnits());
 
             var result = controller.GetUnit("non-existing-id");
             Assert.IsInstanceOfType(result, typeof(NotFoundResult));
@@ -66,7 +66,7 @@ namespace REST_API_UNIT.Test
         public void PostUnit_ShouldReturnCreated()
         {
             var testUnits = GetTestUnits();
-            var controller = new SimpleProductController(testUnits);
+            var controller = new SimpleUnitController(testUnits);
 
             var newUnit = new Unit
             {
@@ -89,7 +89,7 @@ namespace REST_API_UNIT.Test
         public void PostUnit_ShouldReturnConflict_WhenIdExists()
         {
             var testUnits = GetTestUnits();
-            var controller = new SimpleProductController(testUnits);
+            var controller = new SimpleUnitController(testUnits);
 
             var existingUnit = testUnits[0]; // Trying to post a unit with an existing ID
 
@@ -102,7 +102,7 @@ namespace REST_API_UNIT.Test
         public void PutUnit_ShouldReturnOk()
         {
             var testUnits = GetTestUnits();
-            var controller = new SimpleProductController(testUnits);
+            var controller = new SimpleUnitController(testUnits);
 
             var updatedUnit = new Unit
             {
@@ -125,7 +125,7 @@ namespace REST_API_UNIT.Test
         public void PutUnit_ShouldReturnNotFound_WhenIdDoesNotExist()
         {
             var testUnits = GetTestUnits();
-            var controller = new SimpleProductController(testUnits);
+            var controller = new SimpleUnitController(testUnits);
 
             var updatedUnit = new Unit
             {
