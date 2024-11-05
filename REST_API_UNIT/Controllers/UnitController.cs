@@ -26,7 +26,7 @@ namespace REST_API_UNIT.Controllers
         {
             try
             {
-                if (Utils.InputValidationUtils.IsValid(request.Name) && Utils.InputValidationUtils.IsValid(request.Type))
+                if (InputValidationUtils.IsValid(request.Name) && InputValidationUtils.IsValid(request.Type))
                 {
                     DTOUnitGetSingleResponse response = new();
                     var unit = new Unit
